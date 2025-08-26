@@ -73,6 +73,11 @@ userServiceMock.updateProfile.mockResolvedValue(undefined);
 expect(userServiceMock.getName()).toBe('John Doe');
 expect(userServiceMock.getEmail()).toBe('john@example.com');
 await expect(userServiceMock.updateProfile({})).resolves.toBe(undefined);
+
+// Use .spy() method for test assertions
+expect(userServiceMock.getName.spy()).toHaveBeenCalledTimes(1);
+expect(userServiceMock.getEmail.spy()).toHaveBeenCalledTimes(1);
+expect(userServiceMock.updateProfile.spy()).toHaveBeenCalledWith({});
 ```
 
 ### mockDeepFn
@@ -143,6 +148,9 @@ Creates a shallow mock where each property of type `T` becomes a Bun mock functi
 **Returns:**
 - `MockInstance<T>` - A proxy object where each property is a Bun mock function
 
+**Additional Methods:**
+- `.spy()` - Available on each mocked property, returns the underlying Bun mock function for test assertions
+
 ### `mockDeepFn<T extends object>(): MockInstance<T>`
 
 Creates a deep mock that automatically handles nested objects, making every property at any depth a callable mock function.
@@ -169,7 +177,7 @@ interface ApiClient {
   post(url: string, data: any): Promise<any>;
 }
 
-test('should mock API client methods', () => {
+test('should mock API client methods', async () => {
   const apiMock = mockFn<ApiClient>();
   
   // Configure mocks
@@ -177,8 +185,14 @@ test('should mock API client methods', () => {
   apiMock.post.mockResolvedValue({ success: true });
   
   // Test async methods
-  expect(apiMock.get('/users')).resolves.toEqual({ data: 'test' });
-  expect(apiMock.post('/users', { name: 'John' })).resolves.toEqual({ success: true });
+  await expect(apiMock.get('/users')).resolves.toEqual({ data: 'test' });
+  await expect(apiMock.post('/users', { name: 'John' })).resolves.toEqual({ success: true });
+  
+  // Use .spy() method for test assertions
+  expect(apiMock.get.spy()).toHaveBeenCalledWith('/users');
+  expect(apiMock.post.spy()).toHaveBeenCalledWith('/users', { name: 'John' });
+  expect(apiMock.get.spy()).toHaveBeenCalledTimes(1);
+  expect(apiMock.post.spy()).toHaveBeenCalledTimes(1);
 });
 ```
 
