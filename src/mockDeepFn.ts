@@ -29,6 +29,11 @@ export const mockDeepFn = <T extends object>(): MockInstance<T> => {
           return typeof method === "function" ? method.bind(target) : method;
         }
 
+        // Add spy() method to access the underlying mock for test assertions
+        if (prop === "spy") {
+          return () => target;
+        }
+
         // For other properties, use the deep mock
         return (deepMock as any)[prop];
       },
