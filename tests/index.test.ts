@@ -2,20 +2,20 @@ import { describe, expect, it, mock, test, type Mock } from "bun:test";
 import { TestClass, type ITestInterface } from "..";
 
 // Create a mapped type that transforms all properties to mocks
-type MockedClass<T> = {
+type MockInstance<T> = {
   // For functions, preserve signature
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
     ? Mock<(...args: A) => R>
-    : // For objects, recursively mock their properties and For properties, return the property type
+    : // For objects, recursively mock their properties but also make them callable as mock functions
     T[K] extends object
-    ? MockedClass<T[K]>
+    ? MockInstance<T[K]> & Mock<() => T[K]>
     : Mock<() => T[K]>;
 };
 
-const mockFn = <T extends object>(): MockedClass<T> => {
+const mockFn = <T extends object>(): MockInstance<T> => {
   const mocks = new Map<string | symbol, Mock<any>>();
 
-  return new Proxy({} as MockedClass<T>, {
+  return new Proxy({} as MockInstance<T>, {
     get: (_, prop) => {
       if (!mocks.has(prop)) {
         mocks.set(prop, mock());
@@ -25,11 +25,11 @@ const mockFn = <T extends object>(): MockedClass<T> => {
   });
 };
 
-const mockDeepFn = <T extends object>(): MockedClass<T> => {
-  const createDeepMock = <U extends object>(): MockedClass<U> => {
+const mockDeepFn = <T extends object>(): MockInstance<T> => {
+  const createDeepMock = <U extends object>(): MockInstance<U> => {
     const mocks = new Map<string | symbol, any>();
 
-    return new Proxy({} as MockedClass<U>, {
+    return new Proxy({} as MockInstance<U>, {
       get: (target, prop) => {
         if (!mocks.has(prop)) {
           const hybridMock = createHybridMock();
@@ -54,7 +54,7 @@ const mockDeepFn = <T extends object>(): MockedClass<T> => {
         }
 
         // For other properties, use the deep mock
-        return deepMock[prop as any];
+        return (deepMock as any)[prop];
       },
 
       apply: (target, thisArg, args) => {
@@ -162,62 +162,57 @@ describe("mockDeepFn", () => {
     ).rejects.toThrow("Async Error");
   });
 
-  test.todo(
-    "second level nested objects should be automatically mocked",
-    () => {
-      const mockedClass = mockDeepFn<TestClass>();
+  test("second level nested objects should be automatically mocked", () => {
+    const mockedClass = mockDeepFn<TestClass>();
 
-      mockedClass.firstNestedClass.secondNestedClass.testObject.mockReturnValue(
-        {
-          test1: "test1",
-          test2: 2,
-          test3: [3],
-        }
-      );
-      mockedClass.firstNestedClass.secondNestedClass.testGetter.mockReturnValue(
-        {
-          test: "test1",
-          test2: "2",
-          test3: "test3",
-        }
-      );
-      mockedClass.firstNestedClass.secondNestedClass.testMethod.mockReturnValue(
-        () => 2
-      );
-      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockResolvedValueOnce(
-        2
-      );
-      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockRejectedValueOnce(
-        new Error("Async Error")
-      );
+    mockedClass.firstNestedClass.secondNestedClass.testObject.mockReturnValue({
+      test1: "test1",
+      test2: 2,
+      test3: [3],
+    });
+    mockedClass.firstNestedClass.secondNestedClass.testGetter.mockReturnValue({
+      test: "test1",
+      test2: "2",
+      test3: "test3",
+    });
+    mockedClass.firstNestedClass.secondNestedClass.testMethod.mockReturnValue(
+      () => 2
+    );
+    mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockResolvedValueOnce(
+      2
+    );
+    mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockRejectedValueOnce(
+      new Error("Async Error")
+    );
 
-      expect(mockedClass.firstNestedClass.secondNestedClass.testObject).toEqual(
-        {
-          test1: "test1",
-          test2: 2,
-          test3: [3],
-        }
-      );
-      expect(mockedClass.firstNestedClass.secondNestedClass.testGetter).toEqual(
-        {
-          test: "test1",
-          test2: "2",
-          test3: "test3",
-        }
-      );
-      expect(
-        mockedClass.firstNestedClass.secondNestedClass.testMethod()()
-      ).toBe(2);
-      expect(
-        mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
-          error: false,
-        })
-      ).resolves.toBe(2);
-      expect(
-        mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
-          error: true,
-        })
-      ).rejects.toThrow("Async Error");
-    }
-  );
+    // caveat: nested literal objects are not mocked, and we need to call the method to get the mock value in the assertions
+    expect(mockedClass.firstNestedClass.secondNestedClass.testObject()).toEqual(
+      {
+        test1: "test1",
+        test2: 2,
+        test3: [3],
+      }
+    );
+    // caveat: getters returning a literal object are expected to be called to get the mock value in the assertions
+    expect(mockedClass.firstNestedClass.secondNestedClass.testGetter()).toEqual(
+      {
+        test: "test1",
+        test2: "2",
+        test3: "test3",
+      }
+    );
+    expect(mockedClass.firstNestedClass.secondNestedClass.testMethod()()).toBe(
+      2
+    );
+    expect(
+      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
+        error: false,
+      })
+    ).resolves.toBe(2);
+    expect(
+      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
+        error: true,
+      })
+    ).rejects.toThrow("Async Error");
+  });
 });
