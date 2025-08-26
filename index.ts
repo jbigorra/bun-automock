@@ -1,52 +1,36 @@
-export const obj = {
-  name: "John",
-  lastName: "Doe",
-  age: 30,
-  city: "New York",
-  fullname: function () {
-    return this.name + " " + this.lastName;
-  },
-};
-
-export class Person {
+export class TestClass implements ITestInterface {
   name: string;
   lastName: string;
-  age: number;
-  city: string;
 
-  constructor(name: string, lastName: string, age: number, city: string) {
+  constructor(name: string, lastName: string) {
     this.name = name;
     this.lastName = lastName;
-    this.age = age;
-    this.city = city;
   }
 
   fullname() {
     return this.name + " " + this.lastName;
   }
+
+  async asyncMethodSuccess(): Promise<string> {
+    return Promise.resolve("asyncMethod");
+  }
+
+  async asyncMethodError(): Promise<Error> {
+    return Promise.reject(new Error("asyncMethodError"));
+  }
 }
 
-export interface IPerson {
+export interface ITestInterface {
   name: string;
   lastName: string;
-  age: number;
-  city: string;
   fullname: () => string;
-}
-
-// Literal Object
-console.log("### Literal Object");
-for (const key in obj) {
-  if (Object.prototype.hasOwnProperty.call(obj, key)) {
-    const element = obj[key as keyof typeof obj];
-    const type = typeof element;
-    console.log(key, type);
-  }
+  asyncMethodSuccess: () => Promise<string>;
+  asyncMethodError: () => Promise<Error>;
 }
 
 // Class instance
 console.log("\n### Class instance");
-const person = new Person("John", "Doe", 30, "New York");
+const person = new TestClass("John", "Doe");
 
 const allKeys = [
   ...Object.getOwnPropertyNames(person),

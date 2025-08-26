@@ -1,5 +1,5 @@
 import { describe, expect, it, mock, type Mock } from "bun:test";
-import { Person } from "..";
+import { TestClass } from "..";
 
 // Create a mapped type that transforms all properties to mocks
 type MockedClass<T> = {
@@ -23,18 +23,16 @@ const mockFn = <T extends object>(): MockedClass<T> => {
 
 describe("Person", () => {
   it("should set own properties as mock functions with proper mock methods", () => {
-    const mockedClass = mockFn<Person>();
+    const mockedClass = mockFn<TestClass>();
 
     // Properties can use mock methods and return the correct type
     mockedClass.name.mockReturnValue("Mocked John");
-    mockedClass.age.mockReturnValue(25);
 
     // Methods preserve their signature and can use mock methods
     mockedClass.fullname.mockReturnValue("Mocked Full Name");
 
     // Test that they work
     expect(mockedClass.name()).toBe("Mocked John");
-    expect(mockedClass.age()).toBe(25);
     expect(mockedClass.fullname()).toBe("Mocked Full Name");
 
     // Verify mock methods are available
@@ -43,7 +41,7 @@ describe("Person", () => {
   });
 
   it("should support async mock methods", () => {
-    const mockedClass = mockFn<Person>();
+    const mockedClass = mockFn<TestClass>();
 
     // For async scenarios
     mockedClass.fullname.mockResolvedValue("Async Full Name");
