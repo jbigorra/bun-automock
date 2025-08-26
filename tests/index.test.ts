@@ -40,12 +40,19 @@ describe("Person", () => {
     expect(mockedClass.fullname.mockReturnValue).toBeDefined();
   });
 
-  it("should support async mock methods", () => {
+  it("should support successful async mock methods", () => {
     const mockedClass = mockFn<TestClass>();
 
-    // For async scenarios
-    mockedClass.fullname.mockResolvedValue("Async Full Name");
+    mockedClass.asyncMethodSuccess.mockResolvedValue("Async Full Name");
 
-    expect(mockedClass.fullname.mockResolvedValue).toBeDefined();
+    expect(mockedClass.asyncMethodSuccess()).resolves.toBe("Async Full Name");
+  });
+
+  it("should support error async mock methods", () => {
+    const mockedClass = mockFn<TestClass>();
+
+    mockedClass.asyncMethodError.mockRejectedValue(new Error("Async Error"));
+
+    expect(mockedClass.asyncMethodError()).rejects.toThrow("Async Error");
   });
 });
