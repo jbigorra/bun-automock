@@ -31,5 +31,4 @@ jobs:
         with:
           path: |
             node_modules
-            dist
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.sha }}
