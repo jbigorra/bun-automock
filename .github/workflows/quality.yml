@@ -40,9 +40,9 @@ jobs:
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports
+          name: coverage
           path: |
-            coverage/**
+            coverage/lcov.info
           retention-days: 1
   sonarqube:
     name: SonarQube Analysis
@@ -69,7 +69,7 @@ jobs:
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
-          name: coverage-reports
+          name: coverage
 
       - name: SonarQube Scan - Bun Automock
         uses: SonarSource/sonarqube-scan-action@v5
