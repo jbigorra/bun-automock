@@ -3,9 +3,13 @@ import { TestClass, type ITestInterface } from "..";
 
 // Create a mapped type that transforms all properties to mocks
 type MockedClass<T> = {
+  // For functions, preserve signature
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
-    ? Mock<(...args: A) => R> // For functions, preserve signature
-    : Mock<() => T[K]>; // For properties, return the property type
+    ? Mock<(...args: A) => R>
+    : // For objects, recursively mock their properties and For properties, return the property type
+    T[K] extends object
+    ? MockedClass<T[K]>
+    : Mock<() => T[K]>;
 };
 
 const mockFn = <T extends object>(): MockedClass<T> => {
@@ -21,7 +25,7 @@ const mockFn = <T extends object>(): MockedClass<T> => {
   });
 };
 
-describe("TestClass - Mocking", () => {
+describe("mockFn", () => {
   test("mocked properties preserve their signature and can use mock methods", () => {
     const mockedClass = mockFn<TestClass>();
 
@@ -88,5 +92,83 @@ describe("ITestInterface - Mocking", () => {
     expect(mockedClass.asyncMethod({ error: true })).rejects.toThrow(
       "Async Error"
     );
+  });
+});
+
+describe("mockDeepFn", () => {
+  test("nested objects should be automatically mocked", () => {
+    const mockedClass = mockDeepFn<TestClass>();
+
+    // Set first nested class mocks
+    mockedClass.firstNestedClass.testNumber.mockReturnValue(1);
+    mockedClass.firstNestedClass.testGetter.mockReturnValue(2);
+    mockedClass.firstNestedClass.testMethod.mockReturnValue(undefined);
+    mockedClass.firstNestedClass.testAsyncMethod.mockResolvedValueOnce(
+      undefined
+    );
+    mockedClass.firstNestedClass.testAsyncMethod.mockRejectedValueOnce(
+      new Error("Async Error")
+    );
+
+    // Set second nested class mocks
+    mockedClass.firstNestedClass.secondNestedClass.testObject.mockReturnValue({
+      test1: "test1",
+      test2: 2,
+      test3: [3],
+    });
+    mockedClass.firstNestedClass.secondNestedClass.testGetter.mockReturnValue({
+      test: "test1",
+      test2: "2",
+      test3: "test3",
+    });
+    mockedClass.firstNestedClass.secondNestedClass.testMethod.mockReturnValue(
+      () => 1
+    );
+    mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockResolvedValueOnce(
+      1
+    );
+    mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.mockRejectedValueOnce(
+      new Error("Async Error")
+    );
+
+    // Expectations for first nested class
+    expect(mockedClass.firstNestedClass.testNumber()).toBe(1);
+    expect(mockedClass.firstNestedClass.testGetter()).toBe(2);
+    expect(mockedClass.firstNestedClass.testMethod()).toBe(undefined);
+    expect(
+      mockedClass.firstNestedClass.testAsyncMethod({ error: false })
+    ).resolves.toBe(undefined);
+    expect(
+      mockedClass.firstNestedClass.testAsyncMethod({ error: true })
+    ).rejects.toThrow("Async Error");
+
+    // Expectations for second nested class
+    expect(mockedClass.firstNestedClass.secondNestedClass.testObject()).toEqual(
+      {
+        test1: "test1",
+        test2: 2,
+        test3: [3],
+      }
+    );
+    expect(mockedClass.firstNestedClass.secondNestedClass.testGetter()).toEqual(
+      {
+        test: "test1",
+        test2: "2",
+        test3: "test3",
+      }
+    );
+    expect(mockedClass.firstNestedClass.secondNestedClass.testMethod()).toBe(
+      () => 1
+    );
+    expect(
+      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
+        error: false,
+      })
+    ).resolves.toBe(1);
+    expect(
+      mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
+        error: true,
+      })
+    ).rejects.toThrow("Async Error");
   });
 });
