@@ -1,4 +1,27 @@
 {
+  "private": false,
+  "version": "0.1.0",
+  "description": "A TypeScript library that provides automatic mocking utilities for Bun's test framework, enabling easy creation of type-safe mocks for complex objects and nested structures.",
+  "author": "Juan Bigorra <jbigorra.soft.eng@pm.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbigorra/bun-automock.git"
+  },
+  "keywords": [
+    "bun",
+    "automock",
+    "mocking",
+    "testing",
+    "typescript"
+  ],
+  "homepage": "https://github.com/jbigorra/bun-automock",
+  "bugs": {
+    "url": "https://github.com/jbigorra/bun-automock/issues"
+  },
+  "engines": {
+    "bun": ">=1.2.21"
+  },
   "name": "bun-automock",
   "module": "src/index.ts",
   "type": "module",
