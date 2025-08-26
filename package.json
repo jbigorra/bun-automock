@@ -9,8 +9,8 @@
     }
   },
   "scripts": {
-    "install-deps": "bun install && pnpm install",
     "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "build": "rm -rf dist && bun build.ts && bun run build:types",
     "build:types": "tsc --noEmit false --emitDeclarationOnly --declaration --declarationMap"
   },
