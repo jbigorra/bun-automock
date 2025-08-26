@@ -1,9 +1,22 @@
 {
   "name": "bun-automock",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "install-deps": "bun install && pnpm install",
+    "test": "bun test",
+    "build": "rm -rf dist && bun build.ts && bun run build:types",
+    "build:types": "tsc --noEmit false --emitDeclarationOnly --declaration --declarationMap"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5"
   },
   "peerDependencies": {
     "typescript": "^5"
