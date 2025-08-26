@@ -11,9 +11,6 @@ jobs:
     name: Test and Lint
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
-    strategy:
-      matrix:
-        task: [test:coverage] # add lint to the list when we have a linting step
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,12 +19,17 @@ jobs:
 
       - name: Enable Corepack
         run: corepack enable
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+
       - name: Restore workspace cache
         uses: actions/cache@v4
         with:
           path: |
             node_modules
-            dist
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.event.workflow_run.head_sha }}
           restore-keys: |
             workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-
