@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "bun test",
-    "test:coverage": "bun test --coverage",
+    "test:coverage": "bun test --coverage && ls -la coverage",
     "build": "rm -rf dist && bun build.ts && bun run build:types",
     "build:types": "tsc --noEmit false --emitDeclarationOnly --declaration --declarationMap"
   },
