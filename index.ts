@@ -7,25 +7,28 @@ export class TestClass implements ITestInterface {
     this.lastName = lastName;
   }
 
-  fullname() {
+  get fullname() {
     return this.name + " " + this.lastName;
   }
 
-  async asyncMethodSuccess(): Promise<string> {
-    return Promise.resolve("asyncMethod");
+  nickName() {
+    return this.name + " 123";
   }
 
-  async asyncMethodError(): Promise<Error> {
-    return Promise.reject(new Error("asyncMethodError"));
+  async asyncMethod(ops: { error?: boolean }): Promise<string | Error> {
+    if (ops.error) {
+      return Promise.reject(new Error("asyncMethodError"));
+    }
+    return Promise.resolve("asyncMethod");
   }
 }
 
 export interface ITestInterface {
   name: string;
   lastName: string;
-  fullname: () => string;
-  asyncMethodSuccess: () => Promise<string>;
-  asyncMethodError: () => Promise<Error>;
+  fullname: string;
+  nickName: () => string;
+  asyncMethod: (ops: { error?: boolean }) => Promise<string | Error>;
 }
 
 // Class instance

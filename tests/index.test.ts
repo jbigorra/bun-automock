@@ -1,5 +1,5 @@
-import { describe, expect, it, mock, type Mock } from "bun:test";
-import { TestClass } from "..";
+import { describe, expect, it, mock, test, type Mock } from "bun:test";
+import { TestClass, type ITestInterface } from "..";
 
 // Create a mapped type that transforms all properties to mocks
 type MockedClass<T> = {
@@ -21,38 +21,72 @@ const mockFn = <T extends object>(): MockedClass<T> => {
   });
 };
 
-describe("Person", () => {
-  it("should set own properties as mock functions with proper mock methods", () => {
+describe("TestClass - Mocking", () => {
+  test("mocked properties preserve their signature and can use mock methods", () => {
     const mockedClass = mockFn<TestClass>();
 
-    // Properties can use mock methods and return the correct type
     mockedClass.name.mockReturnValue("Mocked John");
 
-    // Methods preserve their signature and can use mock methods
+    expect(mockedClass.name()).toBe("Mocked John");
+  });
+
+  test("mocked getters preserve their signature and can use mock methods", () => {
+    const mockedClass = mockFn<TestClass>();
+
     mockedClass.fullname.mockReturnValue("Mocked Full Name");
 
-    // Test that they work
-    expect(mockedClass.name()).toBe("Mocked John");
     expect(mockedClass.fullname()).toBe("Mocked Full Name");
-
-    // Verify mock methods are available
-    expect(mockedClass.name.mockReturnValue).toBeDefined();
-    expect(mockedClass.fullname.mockReturnValue).toBeDefined();
   });
 
-  it("should support successful async mock methods", () => {
+  test("mocked methods preserve their signature and can use mock methods", () => {
     const mockedClass = mockFn<TestClass>();
 
-    mockedClass.asyncMethodSuccess.mockResolvedValue("Async Full Name");
+    mockedClass.nickName.mockReturnValue("Mocked Full Name");
 
-    expect(mockedClass.asyncMethodSuccess()).resolves.toBe("Async Full Name");
+    expect(mockedClass.nickName()).toBe("Mocked Full Name");
   });
 
-  it("should support error async mock methods", () => {
+  test("mocked async methods preserve their signature, can use mock methods and return resolved values", () => {
     const mockedClass = mockFn<TestClass>();
 
-    mockedClass.asyncMethodError.mockRejectedValue(new Error("Async Error"));
+    mockedClass.asyncMethod.mockResolvedValue("Async Full Name");
 
-    expect(mockedClass.asyncMethodError()).rejects.toThrow("Async Error");
+    // The object passed is just to signal the type of Promise to be returned (resolved in this case)
+    expect(mockedClass.asyncMethod({ error: false })).resolves.toBe(
+      "Async Full Name"
+    );
+  });
+
+  test("mocked async methods preserve their signature, can use mock methods and return rejected values", () => {
+    const mockedClass = mockFn<TestClass>();
+
+    mockedClass.asyncMethod.mockRejectedValue(new Error("Async Error"));
+
+    // The object passed is just to signal the type of Promise to be returned (rejected in this case)
+    expect(mockedClass.asyncMethod({ error: true })).rejects.toThrow(
+      "Async Error"
+    );
+  });
+});
+
+describe("ITestInterface - Mocking", () => {
+  it("should set own properties as mock functions with proper mock methods", () => {
+    const mockedClass = mockFn<ITestInterface>();
+
+    mockedClass.name.mockReturnValue("Mocked John");
+    mockedClass.lastName.mockReturnValue("Mocked Doe");
+    mockedClass.nickName.mockReturnValue("Mocked John Doe");
+    mockedClass.asyncMethod.mockResolvedValueOnce("Async Full Name");
+    mockedClass.asyncMethod.mockRejectedValueOnce(new Error("Async Error"));
+
+    expect(mockedClass.name()).toBe("Mocked John");
+    expect(mockedClass.lastName()).toBe("Mocked Doe");
+    expect(mockedClass.nickName()).toBe("Mocked John Doe");
+    expect(mockedClass.asyncMethod({ error: false })).resolves.toBe(
+      "Async Full Name"
+    );
+    expect(mockedClass.asyncMethod({ error: true })).rejects.toThrow(
+      "Async Error"
+    );
   });
 });
