@@ -16,15 +16,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: ".bun-version"
-
       - name: Restore workspace cache
         uses: actions/cache@v4
         with:
@@ -33,10 +28,8 @@ jobs:
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.event.workflow_run.head_sha }}
           restore-keys: |
             workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-
-
       - name: Run test with coverage
         run: bun run test:coverage
-
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -55,7 +48,6 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
-
       - name: Restore workspace cache
         uses: actions/cache@v4
         with:
@@ -65,7 +57,6 @@ jobs:
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.event.workflow_run.head_sha }}
           restore-keys: |
             workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-
-
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
@@ -76,7 +67,6 @@ jobs:
           find . -name "lcov.info"
           LCOV_PATH=$(find . -name "lcov.info" | head -n 1)
           echo "LCOV_PATH=$LCOV_PATH" >> $GITHUB_ENV
-
       - name: SonarQube Scan - Bun Automock
         uses: SonarSource/sonarqube-scan-action@v5
         with:
