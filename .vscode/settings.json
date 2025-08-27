@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "jbsoft",
+        "projectKey": "jbsoft_bun-automock"
+    }
+}
