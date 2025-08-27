@@ -70,6 +70,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage
+      - name: Find coverage report file
+        run: |
+          ls -la
+          find . -name "lcov.info"
+          LCOV_PATH=$(find . -name "lcov.info" | head -n 1)
+          echo "LCOV_PATH=$LCOV_PATH" >> $GITHUB_ENV
 
       - name: SonarQube Scan - Bun Automock
         uses: SonarSource/sonarqube-scan-action@v5
@@ -79,3 +85,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_SCANNER_OPTS: >
             -Dsonar.log.level=WARN
+            -Dsonar.javascript.lcov.reportPaths=${{ env.LCOV_PATH }}
