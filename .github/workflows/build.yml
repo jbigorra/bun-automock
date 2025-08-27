@@ -31,4 +31,9 @@ jobs:
         with:
           path: |
             node_modules
+            dist
+            README.md
+            LICENSE
+            .bun-version
+            package.json
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.sha }}

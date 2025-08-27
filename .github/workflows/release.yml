@@ -8,25 +8,30 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version-file: ".bun-version"
-
       - name: Restore workspace cache
         uses: actions/cache@v4
         with:
           path: |
             node_modules
+            dist
+            README.md
+            LICENSE
+            .bun-version
+            package.json
           key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.event.workflow_run.head_sha }}
           restore-keys: |
             workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-
-
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.x"
+          registry-url: "https://registry.npmjs.org"
       - name: Publish to npm
         run: npm publish
         env:
