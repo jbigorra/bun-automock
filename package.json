@@ -2,7 +2,7 @@
   "private": false,
   "version": "0.1.0",
   "description": "A TypeScript library that provides automatic mocking utilities for Bun's test framework, enabling easy creation of type-safe mocks for complex objects and nested structures.",
-  "author": "Juan Bigorra <jbigorra.soft.eng@pm.me>",
+  "author": "Juan Bigorra <opensource@juanbigorra.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
   },
   "scripts": {
     "test": "bun test",
+    "tdd": "bun test --watch",
     "test:coverage": "bun test --coverage && ls -la coverage",
     "build": "rm -rf dist && bun build.ts && bun run build:types",
     "build:types": "tsc --noEmit false --emitDeclarationOnly --declaration --declarationMap"
