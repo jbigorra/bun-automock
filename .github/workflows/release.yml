@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*" # e.g. v1.0.0
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+
+      - name: Restore workspace cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+          key: workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-${{ github.event.workflow_run.head_sha }}
+          restore-keys: |
+            workspace-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}-
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
