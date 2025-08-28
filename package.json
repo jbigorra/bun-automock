@@ -45,7 +45,7 @@
     "clean": "rm -rf dist coverage",
     "test:coverage": "bun test --coverage",
     "build": "rm -rf dist && bun build.ts && bun run build:types",
-    "build:types": "tsc --noEmit false --emitDeclarationOnly --declaration --declarationMap"
+    "build:types": "tsc --project tsconfig.dts.json"
   },
   "publishConfig": {
     "access": "public"
