@@ -1,10 +1,10 @@
 import { type Mock, mock } from "bun:test";
-import type { MockInstance } from "./types";
+import type { MockProxy } from "./types";
 
-export const mockFn = <T extends object>(): MockInstance<T> => {
+export const mockFn = <T>(): MockProxy<T> => {
   const mocks = new Map<string | symbol, Mock<any>>();
 
-  return new Proxy({} as MockInstance<T>, {
+  return new Proxy({} as MockProxy<T>, {
     get: (_, prop) => {
       if (!mocks.has(prop)) {
         const regularMock = mock();

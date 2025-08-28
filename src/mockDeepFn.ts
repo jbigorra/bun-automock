@@ -1,11 +1,11 @@
 import { mock, type Mock } from "bun:test";
-import type { MockInstance } from "./types";
+import type { DeepMockProxy } from "./types";
 
-export const mockDeepFn = <T extends object>(): MockInstance<T> => {
-  const createDeepMock = <U extends object>(): MockInstance<U> => {
+export const mockDeepFn = <T extends object>(): DeepMockProxy<T> => {
+  const createDeepMock = <U extends object>(): DeepMockProxy<U> => {
     const mocks = new Map<string | symbol, any>();
 
-    return new Proxy({} as MockInstance<U>, {
+    return new Proxy({} as DeepMockProxy<U>, {
       get: (target, prop) => {
         if (!mocks.has(prop)) {
           const hybridMock = createHybridMock();
