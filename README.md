@@ -29,8 +29,8 @@ A TypeScript library that provides automatic mocking utilities for Bun's test fr
   - [`mockDeepFn()`](#mockdeepfn)
   - [`.spy()`](#spy)
 - [API Reference](#api-reference)
-  - [`mockFn<T extends object>(): MockInstance<T>`](#mockfnt-extends-object-mockinstancet)
-  - [`mockDeepFn<T extends object>(): MockInstance<T>`](#mockdeepfnt-extends-object-mockinstancet)
+  - [`mockFn<T>(): MockProxy<T>`](#mockfnt-mockproxyt)
+  - [`mockDeepFn<T extends object>(): DeepMockProxy<T>`](#mockdeepfnt-extends-object-deepmockproxyt)
 - [Contributing to the project](#contributing-to-the-project)
   - [Install dependencies](#install-dependencies)
   - [Build the library](#build-the-library)
@@ -55,9 +55,12 @@ To set up the project for development:
 
 ## Available Scripts
 
-- `bun run test` - Run the test suite
+- `bun run test` - Run the test suite once
+- `bun run tdd` - Run tests in watch mode for continuous development
+- `bun run test:coverage` - Run tests with coverage reporting
 - `bun run build` - Build the project and generate type declarations
 - `bun run build:types` - Generate TypeScript declaration files only
+- `bun run clean` - Clean the dist and coverage directories
 
 ## Usage
 
@@ -86,6 +89,10 @@ userServiceMock.updateProfile.mockResolvedValue(undefined);
 expect(userServiceMock.getName()).toBe('John Doe');
 expect(userServiceMock.getEmail()).toBe('john@example.com');
 await expect(userServiceMock.updateProfile({})).resolves.toBe(undefined);
+
+// Use .spy() for test assertions
+expect(userServiceMock.getName.spy()).toHaveBeenCalledTimes(1);
+expect(userServiceMock.updateProfile.spy()).toHaveBeenCalledWith({});
 ```
 
 ### `mockDeepFn()`
@@ -141,7 +148,7 @@ expect(dbMock.users.repository.findById.spy()).toHaveReturnedTimes(2);
 
 ## API Reference
 
-### `mockFn<T extends object>(): MockInstance<T>`
+### `mockFn<T>(): MockProxy<T>`
 
 Creates a shallow mock where each property of type `T` becomes a Bun mock function.
 
@@ -149,12 +156,12 @@ Creates a shallow mock where each property of type `T` becomes a Bun mock functi
 - `T` - The type to mock (interface, class, or object type)
 
 **Returns:**
-- `MockInstance<T>` - A proxy object where each property is a Bun mock function
+- `MockProxy<T>` - A proxy object where each property is a Bun mock function
 
 **Additional Methods:**
 - `.spy()` - Available on each mocked property, returns the underlying Bun mock function for test assertions
 
-### `mockDeepFn<T extends object>(): MockInstance<T>`
+### `mockDeepFn<T extends object>(): DeepMockProxy<T>`
 
 Creates a deep mock that automatically handles nested objects, making every property at any depth a callable mock function.
 
@@ -162,7 +169,7 @@ Creates a deep mock that automatically handles nested objects, making every prop
 - `T` - The type to mock (interface, class, or object type)
 
 **Returns:**
-- `MockInstance<T>` - A proxy object with deep mocking capabilities
+- `DeepMockProxy<T>` - A proxy object with deep mocking capabilities
 
 **Additional Methods:**
 - `.spy()` - Available on each mocked property, returns the underlying Bun mock function for test assertions
@@ -203,8 +210,9 @@ The built files will be available in the `dist` directory:
 Run the test suite:
 
 ```bash
-bun test # for one time only
-bun tdd # for continuous testing
+bun test          # Run tests once
+bun run tdd       # Run tests in watch mode for continuous development
+bun test:coverage # Run tests with coverage reporting
 ```
 
 The tests are written using [Bun's test framework](https://bun.sh/docs/testing/writing-tests).
