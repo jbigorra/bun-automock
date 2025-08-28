@@ -1,13 +1,15 @@
 import type { Mock } from "bun:test";
 
-export type MockInstance<T> = MockProxy<T>;
-
-export type MockProxy<T> = {
-  // For functions, preserve signature and add spy method
-  [K in keyof T]: T[K] extends (...args: infer A) => infer R
-    ? Mock<(...args: A) => R> & { spy(): Mock<(...args: A) => R> }
-    : // For objects, recursively mock their properties but also make them callable as mock functions
-    T[K] extends object
-    ? MockProxy<T[K]> & Mock<() => T[K]> & { spy(): Mock<() => T[K]> }
-    : Mock<() => T[K]> & { spy(): Mock<() => T[K]> };
+interface MockWithSpy<A extends any[], R> extends Mock<(...args: A) => R> {
+  spy(): Mock<(...args: A) => R>;
+}
+type _MockProxy<T> = {
+  [K in keyof T]: T[K] extends (...args: infer A) => infer R ? T[K] & MockWithSpy<A, R> : T[K];
 };
+type MockProxy<T> = _MockProxy<T> & T;
+type _DeepMockProxy<T> = {
+  [K in keyof T]: T[K] extends (...args: infer A) => infer R ? T[K] & MockWithSpy<A, R> : T[K] & _DeepMockProxy<T[K]>;
+};
+type DeepMockProxy<T> = _DeepMockProxy<T> & T;
+
+export type { DeepMockProxy, MockProxy };
