@@ -1,11 +1,13 @@
 import type { Mock } from "bun:test";
 
-export type MockInstance<T> = {
+export type MockInstance<T> = MockProxy<T>;
+
+export type MockProxy<T> = {
   // For functions, preserve signature and add spy method
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
     ? Mock<(...args: A) => R> & { spy(): Mock<(...args: A) => R> }
     : // For objects, recursively mock their properties but also make them callable as mock functions
     T[K] extends object
-    ? MockInstance<T[K]> & Mock<() => T[K]> & { spy(): Mock<() => T[K]> }
+    ? MockProxy<T[K]> & Mock<() => T[K]> & { spy(): Mock<() => T[K]> }
     : Mock<() => T[K]> & { spy(): Mock<() => T[K]> };
 };
