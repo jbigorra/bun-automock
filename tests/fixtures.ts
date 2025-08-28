@@ -1,48 +1,29 @@
 export interface ITestInterface {
-  name: string;
-  lastName: string;
-  fullname: string;
   nickName: () => string;
   asyncMethod: (ops: { error?: boolean }) => Promise<string | Error>;
   firstNestedClass: TestClass2;
 }
 
 export interface INestedInterface {
-  testNumber: number;
-  testGetter: number;
-  testMethod: () => void;
-  testAsyncMethod: (ops: { error?: boolean }) => Promise<undefined | Error>;
-  secondNestedClass: IThirdLevelNestedInterface;
+  method: () => void;
+  asyncMethod: (ops: { error?: boolean }) => Promise<undefined | Error>;
+  secondNestedClass: ISecondDegreeNestedInterface;
 }
 
-export interface IThirdLevelNestedInterface {
-  testObject: { [key: string]: unknown };
-  testGetter: Record<string, string>;
+export interface ISecondDegreeNestedInterface {
   testMethod: () => () => number;
   testAsyncMethod: (ops: { error?: boolean }) => Promise<number | Error>;
 }
 
 export class TestClass implements ITestInterface {
-  name: string;
-  lastName: string;
   firstNestedClass: TestClass2;
 
-  constructor(
-    name: string,
-    lastName: string,
-    nestedClass: TestClass2 = new TestClass2()
-  ) {
-    this.name = name;
-    this.lastName = lastName;
+  constructor(nestedClass: TestClass2 = new TestClass2()) {
     this.firstNestedClass = nestedClass;
   }
 
-  get fullname() {
-    return this.name + " " + this.lastName;
-  }
-
   nickName() {
-    return this.name + " 123";
+    return "Johny Bravo";
   }
 
   async asyncMethod(ops: { error?: boolean }): Promise<string | Error> {
@@ -54,23 +35,17 @@ export class TestClass implements ITestInterface {
 }
 
 export class TestClass2 implements INestedInterface {
-  testNumber: number;
-  secondNestedClass: IThirdLevelNestedInterface;
+  secondNestedClass: ISecondDegreeNestedInterface;
 
   constructor(nestedClass: TestClass3 = new TestClass3()) {
-    this.testNumber = 1;
     this.secondNestedClass = nestedClass;
   }
 
-  get testGetter(): number {
-    return this.testNumber;
+  method(): void {
+    console.log("testMethod called from TestClass2");
   }
 
-  testMethod(): void {
-    console.log(this.testNumber);
-  }
-
-  async testAsyncMethod(ops: { error?: boolean }): Promise<undefined | Error> {
+  async asyncMethod(ops: { error?: boolean }): Promise<undefined | Error> {
     if (ops.error) {
       return Promise.reject(new Error("testAsyncMethodError"));
     }
@@ -78,17 +53,7 @@ export class TestClass2 implements INestedInterface {
   }
 }
 
-export class TestClass3 implements IThirdLevelNestedInterface {
-  testObject: { [key: string]: unknown };
-
-  constructor() {
-    this.testObject = { test: "test", test2: 2 };
-  }
-
-  get testGetter() {
-    return { test: "test", test2: "2", test3: "test3" };
-  }
-
+export class TestClass3 implements ISecondDegreeNestedInterface {
   testMethod() {
     return () => 1;
   }
