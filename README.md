@@ -11,19 +11,18 @@ A TypeScript library that provides automatic mocking utilities for Bun's test fr
 
 ## Features
 
-- Automatic mocking of complex objects and nested structures
-- Type-safe mocks for interfaces, classes, and objects
-- Easy to use API for creating mocks
-- Built-in support for test assertions
-- Compatible with Bun's test framework
+- ✨ Automatic mocking of complex objects and nested structures
+- 🔒 Type-safe mocks for interfaces, classes, and objects
+- 🎯 Easy to use API for creating mocks
+- 📊 Built-in support for test assertions
+- ⚡ Compatible with Bun's test framework
+- 📦 **Dual package exports** - supports both ESM and CommonJS
 
 ## Table of Contents
 
 - [Features](#features)
 - [Table of Contents](#table-of-contents)
 - [Installation](#installation)
-- [Development Setup](#development-setup)
-- [Available Scripts](#available-scripts)
 - [Usage](#usage)
   - [`mockFn()`](#mockfn)
   - [`mockDeepFn()`](#mockdeepfn)
@@ -32,8 +31,8 @@ A TypeScript library that provides automatic mocking utilities for Bun's test fr
   - [`mockFn<T>(): MockProxy<T>`](#mockfnt-mockproxyt)
   - [`mockDeepFn<T extends object>(): DeepMockProxy<T>`](#mockdeepfnt-extends-object-deepmockproxyt)
 - [Contributing to the project](#contributing-to-the-project)
-  - [Install dependencies](#install-dependencies)
-  - [Build the library](#build-the-library)
+- [Available Scripts](#available-scripts)
+  - [Development](#development)
   - [Testing](#testing)
 - [License](#license)
 - [Author](#author)
@@ -46,21 +45,17 @@ bun add -D bun-automock
 pnpm add -D bun-automock
 # or
 npm install --save-dev bun-automock
-# you got the gist ;)
 ```
 
-## Development Setup
+The package supports both **ESM** and **CommonJS** imports:
 
-To set up the project for development:
+```typescript
+// ESM (recommended)
+import { mockFn, mockDeepFn } from 'bun-automock';
 
-## Available Scripts
-
-- `bun run test` - Run the test suite once
-- `bun run tdd` - Run tests in watch mode for continuous development
-- `bun run test:coverage` - Run tests with coverage reporting
-- `bun run build` - Build the project and generate type declarations
-- `bun run build:types` - Generate TypeScript declaration files only
-- `bun run clean` - Clean the dist and coverage directories
+// CommonJS
+const { mockFn, mockDeepFn } = require('bun-automock');
+```
 
 ## Usage
 
@@ -176,34 +171,44 @@ Creates a deep mock that automatically handles nested objects, making every prop
 
 ## Contributing to the project
 
-The project uses [Bun](https://bun.sh) as the package manager and bundler.
+The project uses [Bun](https://bun.sh) as the package manager and runtime, with [tsdown](https://github.com/sxzz/tsdown) for modern dual-package building.
 
-External dependencies are expected to be none or added for a very good reason.
+External dependencies are kept minimal and added only for compelling reasons.
 
-### Install dependencies
+## Available Scripts
+
+- `bun run test` - Run the test suite once
+- `bun run tdd` - Run tests in watch mode for continuous development
+- `bun run test:coverage` - Run tests with coverage reporting
+- `bun run build` - Build the project with dual package exports (ESM + CJS)
+- `bun run dev` - Build in watch mode for development
+- `bun run clean` - Clean the dist and coverage directories
+
+### Development
+
+To start developing run the following commands:
 
 ```bash
-bun install
-```
-
-### Build the library
-
-To build the library for distribution:
-
-```bash
-bun run build
+bun install   # install dependencies
+bun dev       # build in watch mode for development
+bun tdd       # run tests in watch mode for continuous development
 ```
 
 This will:
 1. Clean the `dist` directory
-2. Bundle the source code using Bun's bundler
-3. Generate TypeScript declaration files (`.d.ts`)
-4. Create source maps for debugging
+2. Bundle the source code using tsdown
+3. Generate both ESM (`index.js`) and CommonJS (`index.cjs`) outputs
+4. Create TypeScript declaration files for both formats (`index.d.ts`, `index.d.cts`)
+5. Generate source maps for debugging
 
 The built files will be available in the `dist` directory:
-- `index.js` - The bundled JavaScript code
-- `index.d.ts` - TypeScript type declarations
-- `index.js.map` - Source map for debugging
+- `index.js` - ESM bundle
+- `index.cjs` - CommonJS bundle
+- `index.d.ts` - TypeScript declarations for ESM
+- `index.d.cts` - TypeScript declarations for CommonJS
+- Source maps for debugging
+
+
 
 ### Testing
 
