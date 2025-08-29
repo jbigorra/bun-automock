@@ -23,13 +23,22 @@
     "bun": ">=1.2.21"
   },
   "name": "bun-automock",
-  "module": "src/index.ts",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -44,7 +53,8 @@
     "tdd": "bun test --watch",
     "clean": "rm -rf dist coverage",
     "test:coverage": "bun test --coverage",
-    "build": "rm -rf dist && bun build.ts && bun run build:types",
+    "dev": "tsdown --watch",
+    "build": "tsdown",
     "build:types": "tsc --project tsconfig.dts.json"
   },
   "publishConfig": {
@@ -52,6 +62,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "tsdown": "^0.14.2",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
