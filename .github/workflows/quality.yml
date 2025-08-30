@@ -68,7 +68,7 @@ jobs:
           LCOV_PATH=$(find . -name "lcov.info" | head -n 1)
           echo "LCOV_PATH=$LCOV_PATH" >> $GITHUB_ENV
       - name: SonarQube Scan - Bun Automock
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v5.3.1
         with:
           projectBaseDir: .
         env:
