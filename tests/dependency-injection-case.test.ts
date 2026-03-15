@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { mockDeepFn } from "../src/mockDeepFn";
 import { mockFn } from "../src/mockFn";
-import { User, UserAction, type IComplexNestedInterface, type IUserRepository } from "./dependency-injection-fixture";
+import { type IComplexNestedInterface, type IUserRepository, User, UserAction } from "./dependency-injection-fixture";
 
 describe("Dependency Injection - mock testing.", () => {
   describe("UserAction.signUp()", () => {
@@ -18,7 +18,7 @@ describe("Dependency Injection - mock testing.", () => {
 
       const user = {
         name: "John Doe",
-        email: "john.doe@example.com",
+        email: "john.doe@example.com"
       };
 
       const actionResult = await userAction.signUp(user);
@@ -37,7 +37,7 @@ describe("Dependency Injection - mock testing.", () => {
 
       const user = {
         name: "John Doe 2",
-        email: "john.doe2@example.com",
+        email: "john.doe2@example.com"
       };
 
       const actionResult = await userAction.signUp(user);
@@ -56,7 +56,7 @@ describe("Dependency Injection - mock testing.", () => {
 
       const user = {
         name: "John Doe 3",
-        email: "john.doe3@example.com",
+        email: "john.doe3@example.com"
       };
 
       const actionResult = await userAction.signUp(user);
@@ -72,7 +72,7 @@ describe("Dependency Injection - mock testing.", () => {
 
       const user = {
         name: "John Doe 4",
-        email: "john.doe4@example.com",
+        email: "john.doe4@example.com"
       };
 
       await expect(userAction.signUp(user)).rejects.toThrow("User not found");
@@ -88,7 +88,7 @@ describe("Dependency Injection - mock testing.", () => {
 
       const user = {
         name: "John Doe 5",
-        email: "john.doe5@example.com",
+        email: "john.doe5@example.com"
       };
 
       await expect(userAction.signUp(user)).rejects.toThrow("Sign up failed");

@@ -1,4 +1,4 @@
-import { mock, type Mock } from "bun:test";
+import { type Mock, mock } from "bun:test";
 import type { DeepMockProxy } from "./types";
 
 export const mockDeepFn = <T extends object>(): DeepMockProxy<T> => {
@@ -12,7 +12,7 @@ export const mockDeepFn = <T extends object>(): DeepMockProxy<T> => {
           mocks.set(prop, hybridMock);
         }
         return mocks.get(prop);
-      },
+      }
     });
   };
 
@@ -41,7 +41,7 @@ export const mockDeepFn = <T extends object>(): DeepMockProxy<T> => {
       apply: (target, thisArg, args) => {
         // When called as a function, use the regular mock with proper context
         return target.apply(target, args); // Use target as thisArg to maintain mock context
-      },
+      }
     });
   };
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { mockFn } from "../src/mockFn";
-import { TestClass, type ITestInterface } from "./fixtures";
+import type { ITestInterface, TestClass } from "./fixtures";
 
 describe("mockFn - with class", () => {
   test("mocked methods preserve their signature, can use mock methods and return the pre-defined value", () => {

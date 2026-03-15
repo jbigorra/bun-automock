@@ -6,12 +6,12 @@ export default defineConfig({
   dts: {
     oxc: true,
     compilerOptions: {
-      removeComments: true,
-    },
+      removeComments: true
+    }
   },
   format: ["esm", "cjs"],
   clean: ["dist", "coverage"],
   sourcemap: true,
   minify: false,
-  external: ["bun:test"],
+  external: ["bun:test"]
 });
