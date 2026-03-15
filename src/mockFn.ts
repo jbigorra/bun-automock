@@ -4,11 +4,12 @@ import type { MockFnWithSpy, MockProxy } from "./types";
 export function mockFn(): MockFnWithSpy;
 export function mockFn<T>(): MockProxy<T>;
 export function mockFn<T>(): MockProxy<T> | MockFnWithSpy {
+  // biome-ignore lint/suspicious/noExplicitAny: required as it is automocking
   const mocks = new Map<string | symbol, Mock<any>>();
   const selfMock = mock();
 
   // biome-ignore lint/suspicious/noExplicitAny: proxy target needs to be callable with arbitrary args
-  const target = Object.assign((...args: any[]) => {}, {}) as any;
+  const target = Object.assign((..._args: any[]) => {}, {}) as any;
 
   return new Proxy(target, {
     get: (_, prop) => {
@@ -27,10 +28,11 @@ export function mockFn<T>(): MockProxy<T> | MockFnWithSpy {
             }
 
             // For all other properties, return from the actual mock
+            // biome-ignore lint/suspicious/noExplicitAny: required as it is automocking
             const value = target[spyProp as keyof Mock<any>];
             return typeof value === "function" ? value.bind(target) : value;
           },
-          apply: (target, thisArg, args) => {
+          apply: (target, _thisArg, args) => {
             return target.apply(target, args);
           }
         });
