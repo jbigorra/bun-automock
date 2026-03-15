@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Build"]
     types: [completed]
-    branches: [main, feature/*, fix/*]
+    branches: [main, develop, feature/*, release/*, hotfix/*]
 
 jobs:
   quality:
