@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { mockFn } from "../src/mockFn";
-import { TestClass, type ITestInterface } from "./fixtures";
+import type { ITestInterface, TestClass } from "./fixtures";
 
 describe("mockFn - with class", () => {
   test("mocked methods preserve their signature, can use mock methods and return the pre-defined value", () => {
@@ -118,5 +118,15 @@ describe("mockFn - with Interface", () => {
     expect(mockedClass.asyncMethod.spy()).toHaveBeenCalledTimes(2);
     expect(mockedClass.asyncMethod.spy()).toHaveBeenNthCalledWith(1, { error: false });
     expect(mockedClass.asyncMethod.spy()).toHaveBeenNthCalledWith(2, { error: true });
+  });
+});
+
+describe("mockFn - without type", () => {
+  test("mockFn returns default mock when no interface is used", async () => {
+    const mockedFunction = mockFn();
+    const result = mockedFunction(1, "string");
+
+    expect(mockedFunction.spy()).toHaveBeenCalledWith(1, "string");
+    expect(result).toBe(undefined);
   });
 });

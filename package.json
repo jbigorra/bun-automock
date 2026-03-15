@@ -55,12 +55,14 @@
     "test:coverage": "bun test --coverage",
     "dev": "tsdown --watch",
     "build": "tsdown",
-    "build:types": "tsc --project tsconfig.dts.json"
+    "build:types": "tsc --project tsconfig.dts.json",
+    "validation": "bun test && tsc --noEmit && biome check ."
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.7",
     "@types/bun": "latest",
     "tsdown": "^0.14.2",
     "typescript": "^5.9.2"

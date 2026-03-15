@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { mockDeepFn } from "../src/mockDeepFn";
-import { TestClass } from "./fixtures";
+import type { TestClass } from "./fixtures";
 
 describe("mockDeepFn", () => {
   test("first level nested object.method() should be mockable and return the pre-defined value", () => {
@@ -45,12 +45,12 @@ describe("mockDeepFn", () => {
     expect(mockedClass.firstNestedClass.secondNestedClass.testMethod()()).toBe(2);
     expect(
       mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
-        error: false,
+        error: false
       })
     ).resolves.toBe(2);
     expect(
       mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod({
-        error: true,
+        error: true
       })
     ).rejects.toThrow("Async Error");
   });
@@ -70,10 +70,10 @@ describe("mockDeepFn", () => {
     expect(mockedClass.firstNestedClass.secondNestedClass.testMethod.spy()).toHaveBeenCalledTimes(1);
     expect(mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.spy()).toHaveBeenCalledTimes(2);
     expect(mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.spy()).toHaveBeenCalledWith({
-      error: false,
+      error: false
     });
     expect(mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.spy()).toHaveBeenCalledWith({
-      error: true,
+      error: true
     });
     expect(mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.spy()).toHaveReturned();
     expect(mockedClass.firstNestedClass.secondNestedClass.testAsyncMethod.spy()).toHaveReturnedTimes(2);
