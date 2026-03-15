@@ -1,11 +1,21 @@
 import { type Mock, mock } from "bun:test";
-import type { MockProxy } from "./types";
+import type { MockFnWithSpy, MockProxy } from "./types";
 
-export const mockFn = <T>(): MockProxy<T> => {
+export function mockFn(): MockFnWithSpy;
+export function mockFn<T>(): MockProxy<T>;
+export function mockFn<T>(): MockProxy<T> | MockFnWithSpy {
   const mocks = new Map<string | symbol, Mock<any>>();
+  const selfMock = mock();
 
-  return new Proxy({} as MockProxy<T>, {
+  // biome-ignore lint/suspicious/noExplicitAny: proxy target needs to be callable with arbitrary args
+  const target = Object.assign((...args: any[]) => {}, {}) as any;
+
+  return new Proxy(target, {
     get: (_, prop) => {
+      if (prop === "spy") {
+        return () => selfMock;
+      }
+
       if (!mocks.has(prop)) {
         const regularMock = mock();
 
@@ -22,12 +32,15 @@ export const mockFn = <T>(): MockProxy<T> => {
           },
           apply: (target, thisArg, args) => {
             return target.apply(target, args);
-          },
+          }
         });
 
         mocks.set(prop, mockWithSpy);
       }
       return mocks.get(prop);
     },
+    apply: (_target, _thisArg, args) => {
+      return selfMock(...args);
+    }
   });
-};
+}
